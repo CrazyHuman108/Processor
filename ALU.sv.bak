@@ -1,0 +1,35 @@
+module ALU (
+  input  logic              alu_enable,          // Enable ALU operation
+  input  logic [3:0]        ALU_code,            // Operation code
+  input  logic signed [7:0] ALU_input [0:4],     // Signed input array
+  output logic [7:0]        ALU_output,          // Output: positive magnitude only
+  output logic              sign                 // Sign = 1 if result was negative
+);
+
+  logic signed [8:0] temp_result; // 9-bit for overflow handling
+
+  always_comb begin
+    // Default outputs
+    temp_result = 0;
+    ALU_output  = 8'b0;
+    sign        = 0;
+
+    if (alu_enable) begin
+      // Perform operation based on ALU_code
+      case (ALU_code)
+        4'b0001: temp_result = ALU_input[0] + ALU_input[1] + ALU_input[2] + ALU_input[3] + ALU_input[4];
+        default: temp_result = 0;
+      endcase
+
+      // Process sign and magnitude output
+      if (temp_result < 0) begin
+        ALU_output = -temp_result[7:0]; // Get magnitude of negative value
+        sign       = 1;
+      end else begin
+        ALU_output = temp_result[7:0];  // Already positive
+        sign       = 0;
+      end
+    end
+  end
+
+endmodule

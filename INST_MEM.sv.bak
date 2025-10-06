@@ -1,0 +1,28 @@
+module INST_MEM #(
+  parameter DATA_WIDTH = 8,
+  parameter ADDRESS_WIDTH = 4,
+  parameter INSTRUCTIONS = "instructions.hex"
+) (
+  input logic clk,
+  input logic rd_en,
+  input logic [ADDRESS_WIDTH - 1: 0] address,
+  output logic [DATA_WIDTH - 1 : 0] data_out
+);
+
+  // Declare instruction memory 
+  logic [DATA_WIDTH - 1 : 0] program_mem [(ADDRESS_WIDTH << 1) - 1];
+
+  // loading hex file
+  initial begin
+    $readmemh(INSTRUCTIONS, program_mem); 
+  end
+  
+  always_ff @(posedge clk)
+    begin
+	   if(rd_en == 1'b1)
+	     data_out <= program_mem[address];	
+		 else
+		   data_out <= 8'b00000000;
+	 end
+
+endmodule
